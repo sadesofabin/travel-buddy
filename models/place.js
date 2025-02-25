@@ -5,6 +5,8 @@ const ContributionSchema = new mongoose.Schema(
     name: { type: String, required: true },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
+    district: { type: String, required: true },
+    state: { type: String, required: true },
     type: {
       type: String,
       enum: ["coastal", "mountain", "desert", "forest", "plains", "hills"],

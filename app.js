@@ -7,6 +7,8 @@ const userRoutes = require("./routes/userRoutes");
 const placeRoutes = require("./routes/placeRoutes");
 const locationRoutes = require("./routes/location");
 const commentsRoutes = require("./routes/comments");
+const adminRoutes = require("./routes/admin");
+
 
 
 
@@ -15,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 connectDB();
+app.use("/api/admin", adminRoutes );
 app.use("/api/user", userRoutes);
 app.use("/api/place", placeRoutes);
 app.use("/api/locations", locationRoutes);
