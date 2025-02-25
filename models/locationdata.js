@@ -28,6 +28,7 @@ const LocationSchema = new mongoose.Schema(
     metaTitle: { type: String },
     metaDescription: { type: String },
     isDeleted: { type: Boolean, default: false },
+    commentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   },
   {
     timestamps: true,

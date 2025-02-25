@@ -6,6 +6,8 @@ const errorHandler = require("./helpers/errorHandler");
 const userRoutes = require("./routes/userRoutes");
 const placeRoutes = require("./routes/placeRoutes");
 const locationRoutes = require("./routes/location");
+const commentsRoutes = require("./routes/comments");
+
 
 
 const app = express();
@@ -16,6 +18,8 @@ connectDB();
 app.use("/api/user", userRoutes);
 app.use("/api/place", placeRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/comments", commentsRoutes);
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

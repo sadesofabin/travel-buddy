@@ -1,5 +1,7 @@
 const catchAsync = require("../helpers/catchAsync");
 const { Location, Hotel } = require('../models/locationdata');
+const axios = require("axios");
+
 
 const getLocationByCoordinates = catchAsync(async (req, res) => {
   const { lat, long } = req.query;
@@ -98,7 +100,7 @@ const nearByLocations = catchAsync(async (req, res) => {
   const nearByHotels = async (req, res) => {
     try {
       const { lat, lng, page = 1, limit = 10 } = req.query;
-  
+    
       if (!lat || !lng) {
         return res.status(400).json({
           success: false,
