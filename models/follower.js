@@ -9,14 +9,22 @@ const FollowerSchema = new mongoose.Schema(
     },
     followers: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        status: { type: Boolean, default: false },
       },
     ],
     following: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        status: { type: Boolean, default: true },
       },
     ],
   },

@@ -9,6 +9,8 @@ const locationRoutes = require("./routes/location");
 const commentsRoutes = require("./routes/comments");
 const adminRoutes = require("./routes/admin");
 const wishlistRoutes = require("./routes/wishList");
+const followerRoutes = require("./routes/follower");
+
 
 
 
@@ -25,6 +27,8 @@ app.use("/api/place", placeRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/wishList", wishlistRoutes)
+app.use("/api/follower", followerRoutes)
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
