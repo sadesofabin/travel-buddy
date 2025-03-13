@@ -3,10 +3,29 @@ const catchAsync = require("../helpers/catchAsync");
 
 // Create Contribution
 const createContribution = catchAsync(async (req, res) => {
+  const { latitude, longitude } = req.body;
+
+  // Check if a contribution with the same latitude & longitude already exists
+  const existingContribution = await Contribution.findOne({ latitude, longitude });
+
+  if (existingContribution) {
+    return res.status(400).json({
+      success: false,
+      message: "A contribution at this location already exists.",
+    });
+  }
+
+  // If no existing contribution, save the new one
   const contribution = new Contribution(req.body);
   await contribution.save();
-  res.status(201).json(contribution);
+
+  res.status(201).json({
+    success: true,
+    message: "Contribution created successfully.",
+    data: contribution,
+  });
 });
+
 
 // Get All Contributions
 const getContributions = catchAsync(async (req, res) => {
