@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const ContributionSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
     name: { type: String, required: true },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
@@ -13,7 +18,7 @@ const ContributionSchema = new mongoose.Schema(
       required: true,
     },
     description: { type: String, required: true },
-    photos: [{ type: String }], // Changed from object to array
+    photos: [{ type: String }],
     bestTime: { type: String },
     facilities: { type: [String] },
     hours: { type: String },
@@ -29,7 +34,6 @@ const ContributionSchema = new mongoose.Schema(
     },
     isDeleted: { type: Boolean, default: false },
   },
-  
   { timestamps: true }
 );
 

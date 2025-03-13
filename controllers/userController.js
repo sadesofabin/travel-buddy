@@ -2,13 +2,42 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const { generateToken } = require("../helpers/jwt");
 const catchAsync = require("../helpers/catchAsync");
-const { Location } = require('../models/locationdata');
+const { Location } = require("../models/locationdata");
 
 // Get All Users
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find().populate("places.place");
-    res.status(200).json(users);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const users = await User.find().select("-password").skip(skip).limit(limit);
+
+    const totalUsers = await User.countDocuments();
+
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    res.status(200).json({
+      currentPage: page,
+      totalPages,
+      totalUsers,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getUserById = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -17,8 +46,9 @@ const getUsers = async (req, res) => {
 // Create User
 const createUser = async (req, res) => {
   try {
-    const { fullName, username, email, password, dob } = req.body;
-    if (!fullName || !username || !email || !password) {
+    const { fullName, username, email, password, dob, gender, avatar } =
+      req.body;
+    if (!fullName || !username || !email || !password || !gender || !avatar) {
       return res.status(400).json({ error: "All fields are required." });
     }
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -57,7 +87,6 @@ const createUser = async (req, res) => {
 
 module.exports = { createUser };
 
-
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -73,11 +102,9 @@ const userLogin = async (req, res) => {
     }
 
     if (user.isDeleted) {
-      return res
-        .status(403)
-        .json({
-          message: "Your account has been deactivated. Contact support.",
-        });
+      return res.status(403).json({
+        message: "Your account has been deactivated. Contact support.",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -105,13 +132,12 @@ const userLogin = async (req, res) => {
   }
 };
 
-
 const getFollowers = catchAsync(async (req, res) => {
   const { userId } = req.params;
 
   const user = await User.findById(userId).populate({
     path: "followers",
-    select: "fullName username email profilePic", 
+    select: "fullName username email profilePic",
   });
 
   if (!user) {
@@ -124,13 +150,12 @@ const getFollowers = catchAsync(async (req, res) => {
   });
 });
 
-
 const getFollowing = catchAsync(async (req, res) => {
   const { userId } = req.params;
 
   const user = await User.findById(userId).populate({
     path: "following",
-    select: "fullName username email profilePic", 
+    select: "fullName username email profilePic",
   });
 
   if (!user) {
@@ -145,86 +170,11 @@ const getFollowing = catchAsync(async (req, res) => {
 
 
 
-
-const addToWishlist = catchAsync(async (req, res) => {
-  const { userId, placeId } = req.body;
-
-  // Validate required fields
-  if (!userId || !placeId) {
-    return res.status(400).json({ success: false, message: 'userId and placeId are required' });
-  }
-
-  // Find user
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ success: false, message: 'User not found' });
-  }
-
-  // Check if the place exists
-  const place = await Location.findById(placeId);
-  if (!place) {
-    return res.status(404).json({ success: false, message: 'Place not found' });
-  }
-
-  // Check if the place is already in the wishlist
-  const existingWishlistItem = user.places.find(
-    (p) => p.place.toString() === placeId && p.wishlist === true
-  );
-
-  if (existingWishlistItem) {
-    return res.status(400).json({ success: false, message: 'Place already in wishlist' });
-  }
-
-  // Add place to wishlist
-  user.places.push({ place: placeId, wishlist: true });
-  await user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Place added to wishlist successfully',
-    wishlist: user.places.filter((p) => p.wishlist === true),
-  });
-});
-
-
-
-const removeFromWishlist = catchAsync(async (req, res) => {
-  const { userId, placeId } = req.body;
-
-  if (!userId || !placeId) {
-    return res.status(400).json({ success: false, message: 'userId and placeId are required' });
-  }
-
-  // Find user
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ success: false, message: 'User not found' });
-  }
-
-  // Check if the place exists in the wishlist
-  const wishlistItem = user.places.find(
-    (p) => p.place.toString() === placeId && p.wishlist === true
-  );
-
-  if (!wishlistItem) {
-    return res.status(400).json({ success: false, message: 'Place not found in wishlist' });
-  }
-
-  // Remove the place from the wishlist by filtering it out
-  user.places = user.places.filter(
-    (p) => !(p.place.toString() === placeId && p.wishlist === true)
-  );
-
-  await user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Place removed from wishlist successfully',
-    wishlist: user.places.filter((p) => p.wishlist === true),
-  });
-});
-
-
-
-
-module.exports = { userLogin, getUsers, createUser, getFollowers, getFollowing, addToWishlist, removeFromWishlist };
+module.exports = {
+  userLogin,
+  getUsers,
+  createUser,
+  getFollowers,
+  getFollowing,
+  getUserById,
+};

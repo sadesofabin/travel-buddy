@@ -8,6 +8,8 @@ const placeRoutes = require("./routes/placeRoutes");
 const locationRoutes = require("./routes/location");
 const commentsRoutes = require("./routes/comments");
 const adminRoutes = require("./routes/admin");
+const wishlistRoutes = require("./routes/wishList");
+
 
 
 
@@ -22,7 +24,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/place", placeRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/comments", commentsRoutes);
-
+app.use("/api/wishList", wishlistRoutes)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

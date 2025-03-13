@@ -7,7 +7,6 @@ router.get("/getContributions", getContributions);
 router.get("/getContributionById/:id", getContributionById);
 router.put("/updateContribution/:id", updateContribution);
 router.delete("/deleteContribution/:id", deleteContribution);
-router.get("/getContributionswithPagenation", getContributionswithPagenation);
 
 
 module.exports = router;

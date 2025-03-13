@@ -10,9 +10,43 @@ const createContribution = catchAsync(async (req, res) => {
 
 // Get All Contributions
 const getContributions = catchAsync(async (req, res) => {
-  const contributions = await Contribution.find();
-  res.status(200).json(contributions);
+  const limit = parseInt(req.query.limit, 10) || 10; 
+  const offset = parseInt(req.query.offset, 10) || 0; 
+  const status = req.query.status;
+
+  const filter = {};
+  if (status) {
+    const validStatuses = ['requested', 'approved', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status value. Allowed values are: ${validStatuses.join(', ')}.` });
+    }
+    filter.status = status;
+  }
+
+  const totalContributions = await Contribution.countDocuments(filter);
+  
+  const totalPages = Math.ceil(totalContributions / limit);
+  console.log(totalContributions);
+  
+  const contributions = await Contribution.find(filter)
+    .skip(offset)
+    .limit(limit);
+
+    console.log(contributions);
+    
+    
+  const currentPage = Math.floor(offset / limit) + 1;
+
+  res.status(200).json({
+    contributions,
+    currentPage,
+    totalPages,
+    totalContributions,
+  });
 });
+
+
+
 
 // Get Contribution by ID
 const getContributionById = catchAsync(async (req, res) => {
@@ -49,45 +83,6 @@ const deleteContribution = catchAsync(async (req, res) => {
   res.status(200).json({ message: "Contribution soft deleted successfully" });
 });
 
-const getContributionswithPagenation = catchAsync(async (req, res) => {
-  let { page = 1, limit = 10 } = req.query;
-
-  page = Math.max(parseInt(page) || 1, 1);
-  limit = Math.max(parseInt(limit) || 10, 1);
-  const skip = (page - 1) * limit;
-
-  const contributions = await Contribution.aggregate([
-    {
-      $match: {
-        $or: [{ isDeleted: false }, { isDeleted: { $exists: false } }],
-      },
-    },
-    {
-      $facet: {
-        metadata: [{ $count: "totalContributions" }],
-        data: [{ $skip: skip }, { $limit: limit }],
-      },
-    },
-    { $unwind: { path: "$metadata", preserveNullAndEmptyArrays: true } },
-  ]);
-
-  console.log("Aggregation Result:", JSON.stringify(contributions, null, 2));
-
-  const totalContributions =
-    contributions.length && contributions[0].metadata
-      ? contributions[0].metadata.totalContributions
-      : 0;
-  const totalPages =
-    totalContributions > 0 ? Math.ceil(totalContributions / limit) : 1;
-
-  res.status(200).json({
-    page,
-    limit,
-    totalPages,
-    totalContributions,
-    data: contributions.length ? contributions[0].data : [],
-  });
-});
 
 module.exports = {
   createContribution,
@@ -95,5 +90,4 @@ module.exports = {
   getContributionById,
   updateContribution,
   deleteContribution,
-  getContributionswithPagenation,
 };
