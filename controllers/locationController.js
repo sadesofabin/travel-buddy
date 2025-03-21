@@ -245,7 +245,108 @@ const nearByLocations = catchAsync(async (req, res) => {
   
 
 
+  const getAllHotels = catchAsync(async (req, res) => {
+    const { state, district, pageSize, pageNumber } = req.query;
+  
+    // Parse pagination values
+    const parsedPageSize = parseInt(pageSize) || 10;
+    const parsedPageNumber = parseInt(pageNumber) || 1;
+  
+    // Initialize the query object for filtering hotels by state and district (optional)
+    let query = { isDeleted: false };
+  
+    if (state) {
+      query.state = state;
+    }
+  
+    if (district) {
+      query.district = district;
+    }
+  
+    // Calculate pagination
+    const totalHotels = await Hotel.countDocuments(query); // Ensure you're filtering by query
+    const totalPages = Math.ceil(totalHotels / parsedPageSize);
+    const skip = (parsedPageNumber - 1) * parsedPageSize;
+  
+    // Fetch the hotels with pagination applied
+    const hotels = await Hotel.find(query)
+      .skip(skip)
+      .limit(parsedPageSize);
+  
+    return res.status(200).json({
+      success: true,
+      totalHotels,
+      totalPages,
+      pageSize: parsedPageSize,
+      pageNumber: parsedPageNumber,
+      hotels,
+    });
+  });
+
+// Create a hotel
+const createHotel = catchAsync(async (req, res) => {
+  const {
+    name,
+    slug,
+    type,
+    latitude,
+    longitude,
+    state,
+    district,
+    address,
+    description,
+    rating = 0,
+    photos = [],
+    rooms = [],
+    amenities = [],
+    contactInfo,
+    metaTitle,
+    metaDescription,
+  } = req.body;
+
+  // Validate required fields
+  if (!name || !slug || !type || !latitude || !longitude || !state || !district || !address || !description) {
+    return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
+  }
+
+  // Create the location object with coordinates as [longitude, latitude]
+  const location = {
+    type: 'Point',
+    coordinates: [parseFloat(longitude), parseFloat(latitude)],  // Ensure lat and lng are numbers
+  };
+
+  // Create a new hotel
+  const newHotel = new Hotel({
+    name,
+    slug,
+    type,
+    location,
+    state,
+    district,
+    address,
+    description,
+    rating,
+    photos,
+    rooms,
+    amenities,
+    contactInfo,
+    metaTitle,
+    metaDescription,
+  });
+
+  // Save the hotel to the database
+  await newHotel.save();
+
+  return res.status(201).json({
+    success: true,
+    message: 'Hotel created successfully.',
+    data: newHotel,
+  });
+});
+
+
+
 
 module.exports = {
-  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  
+  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  getAllHotels, createHotel
 };
