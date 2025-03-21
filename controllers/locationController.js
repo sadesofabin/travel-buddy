@@ -146,10 +146,48 @@ const nearByLocations = catchAsync(async (req, res) => {
       });
     }
   };
+
+  const getAllLocations = catchAsync(async (req, res) => {
+    const { state, district, pageSize, pageNumber} = req.query;
+  
+    // Parse pagination values
+    const parsedPageSize = parseInt(pageSize) || 10;
+    const parsedPageNumber = parseInt(pageNumber) || 1;
+  
+    // Initialize the query object
+    let query = { isDeleted: false };
+  
+    // Add filtering based on state, district, and terrain if provided
+    if (state) {
+      query.state = state;
+    }
+  
+    if (district) {
+      query.district = district;
+    }
+  
+    // Calculate pagination
+    const totalLocations = await Location.countDocuments(query); // Ensure you're filtering by query
+    const totalPages = Math.ceil(totalLocations / parsedPageSize);
+    const skip = (parsedPageNumber - 1) * parsedPageSize;
+  
+    // Fetch the locations with pagination applied
+    const locations = await Location.find(query).skip(skip).limit(parsedPageSize);
+  
+    return res.status(200).json({
+      success: true,
+      data: locations,
+      totalLocations,
+      totalPages,
+      pageSize: parsedPageSize,
+      pageNumber: parsedPageNumber,
+    });
+  });
+  
   
 
 
 
 module.exports = {
-  getLocationByCoordinates, nearByLocations,  nearByHotels
+  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations
 };

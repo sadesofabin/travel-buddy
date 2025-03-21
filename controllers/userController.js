@@ -85,7 +85,6 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser };
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -167,7 +166,6 @@ const getFollowing = catchAsync(async (req, res) => {
     following: user.following,
   });
 });
-
 
 
 module.exports = {
