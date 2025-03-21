@@ -185,9 +185,67 @@ const nearByLocations = catchAsync(async (req, res) => {
   });
   
   
+  const createLocation = catchAsync(async (req, res) => {
+    const {
+      slug,
+      state,
+      district,
+      lat,
+      lng,
+      terrain,
+      title,
+      placeName,
+      description,
+      rating = 0,
+      resource,
+      metaTitle,
+      metaDescription,
+    } = req.body;
+      
+    if (!slug || !state || !district || !lat || !lng || !terrain || !title || !placeName) {
+      return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
+    }
+  
+    const location = {
+      type: 'Point',
+      coordinates: [parseFloat(lng), parseFloat(lat)],  
+    };
+  
+    let photos = [];
+    if (req.files && req.files.length > 0) {
+      photos = req.files.map(file => file.filename);
+    }
+  
+    const newLocation = new Location({
+      slug,
+      state,
+      district,
+      location,
+      terrain,
+      title,
+      placeName,
+      description,
+      rating,
+      photos, 
+      resource,
+      metaTitle,
+      metaDescription,
+    });
+  
+    await newLocation.save();
+  
+    return res.status(201).json({
+      success: true,
+      message: 'Location created successfully.',
+      data: newLocation,
+    });
+  });
+  
+  
+  
 
 
 
 module.exports = {
-  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations
+  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  
 };

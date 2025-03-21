@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require('path');
 const connectDB = require("./config/db-connect");
 const errorHandler = require("./helpers/errorHandler");
 const userRoutes = require("./routes/userRoutes");
@@ -18,16 +19,32 @@ const followerRoutes = require("./routes/follower");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+    cors({
+      origin: "*", // Allows all origins
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed HTTP methods
+      allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    })
+  );
 
+  
 connectDB();
 app.use("/api/admin", adminRoutes );
+app.use("/src/uploads", express.static(path.resolve(__dirname, "uploads")));
 app.use("/api/user", userRoutes);
 app.use("/api/place", placeRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/wishList", wishlistRoutes)
 app.use("/api/follower", followerRoutes)
+app.get("/health", (req, res) => {
+    res.status(200).json({
+      status: "success",
+      message: "Server is running",
+      timestamp: new Date().toISOString(),
+    });
+  });
+  
 
 app.use(errorHandler);
 
