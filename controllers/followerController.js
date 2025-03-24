@@ -93,6 +93,7 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const { type, limit, offset } = req.query;
 
+  // Validate type
   if (!["followers", "following"].includes(type)) {
     return res.status(400).json({
       success: false,
@@ -100,9 +101,11 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
     });
   }
 
-  const pageLimit = parseInt(limit, 10) || 10; 
-  const pageOffset = parseInt(offset, 10) || 0; 
+  // Convert pagination values to numbers
+  const pageLimit = parseInt(limit, 10) || 10;
+  const pageOffset = parseInt(offset, 10) || 0;
 
+  // Fetch user followers/following with status=true
   const userData = await Follower.findOne({ userId }).populate({
     path: `${type}.user`,
     select: "fullName username profilePic",
@@ -115,9 +118,12 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
     });
   }
 
-  const total = userData[type].length;
+  // Filter only users where status = true
+  const filteredData = userData[type].filter(entry => entry.status === true);
+  const total = filteredData.length;
 
-  const paginatedData = userData[type]
+  // Apply pagination
+  const paginatedData = filteredData
     .slice(pageOffset, pageOffset + pageLimit)
     .map((entry) => ({
       _id: entry.user._id,
@@ -126,12 +132,13 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
       profilePic: entry.user.profilePic,
     }));
 
+  // Pagination calculations
   const totalPages = Math.ceil(total / pageLimit);
   const currentPage = Math.floor(pageOffset / pageLimit) + 1;
 
   res.status(200).json({
     success: true,
-    type, 
+    type,
     total,
     totalPages,
     currentPage,
@@ -139,6 +146,7 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
     data: paginatedData,
   });
 });
+
 
 
 

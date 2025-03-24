@@ -408,6 +408,28 @@ const updateLocationById = catchAsync(async (req, res) => {
 });
 
 
+const getAllLocationsBySlug = catchAsync(async (req, res) => {
+  const { slug } = req.params; // Get slug from URL params
+
+  // Initialize the query object
+  let query = { isDeleted: false };
+
+  // Add filtering based on slug
+  if (slug) {
+    query.slug = slug;
+  }
+
+  // Fetch the locations
+  const locations = await Location.find(query);
+
+  return res.status(200).json({
+    success: true,
+    data: locations,
+  });
+});
+
+
+
 module.exports = {
-  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  getAllHotels, createHotel,updateLocationById
+  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  getAllHotels, createHotel,updateLocationById, getAllLocationsBySlug
 };
