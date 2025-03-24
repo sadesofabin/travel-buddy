@@ -46,9 +46,9 @@ const getUserById = async (req, res) => {
 // Create User
 const createUser = async (req, res) => {
   try {
-    const { fullName, username, email, password, dob, gender, avatar } =
+    const { fullName, username, email, password, dob, gender } =
       req.body;
-    if (!fullName || !username || !email || !password || !gender || !avatar) {
+    if (!fullName || !username || !email || !password || !gender ) {
       return res.status(400).json({ error: "All fields are required." });
     }
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -167,6 +167,48 @@ const getFollowing = catchAsync(async (req, res) => {
   });
 });
 
+// Update User
+
+
+const cleanObject = (obj) => {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === undefined || obj[key] === null) {
+      delete obj[key];
+    }
+  });
+  return obj;
+};
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    let { dob } = req.body;
+
+    // Format DOB if provided
+    if (dob) {
+      const [day, month, year] = dob.split("-");
+      dob = new Date(`${year}-${month}-${day}`);
+    }
+
+    const data = cleanObject(req.body)
+
+    // Update user in the database
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: data },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 module.exports = {
   userLogin,
@@ -175,4 +217,5 @@ module.exports = {
   getFollowers,
   getFollowing,
   getUserById,
+  updateUser
 };

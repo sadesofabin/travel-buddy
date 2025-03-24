@@ -345,8 +345,69 @@ const createHotel = catchAsync(async (req, res) => {
 });
 
 
+const cleanObject = (obj) => {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === undefined || obj[key] === null) {
+      delete obj[key];
+    }
+  });
+  return obj;
+};
+
+
+const updateLocationById = catchAsync(async (req, res) => {
+  
+  const { id } = req.params; 
+
+  const cleanBody = cleanObject(req.body);
+
+  if (cleanBody.lat && cleanBody.lng) {
+    cleanBody.location = {
+      type: 'Point',
+      coordinates: [parseFloat(cleanBody.lng), parseFloat(cleanBody.lat)], 
+    };
+  }
+
+  let photos = [];
+  if (req.files && req.files.length > 0) {
+    photos = req.files.map(file => file.filename); 
+
+    const location = await Location.findById(id);
+    if (location && location.photos && location.photos.length > 0) {
+      location.photos.forEach(oldPhoto => {
+        const oldPhotoPath = path.join(__dirname, 'src/uploads', oldPhoto);
+        if (fs.existsSync(oldPhotoPath)) {
+          fs.unlinkSync(oldPhotoPath); 
+        }
+      });
+    }
+  }
+
+  if (photos.length === 0 && cleanBody.photos === undefined) {
+    const location = await Location.findById(id);
+    photos = location.photos || []; 
+  }
+
+  cleanBody.photos = photos;
+
+  const updatedLocation = await Location.findByIdAndUpdate(
+    id,  
+    cleanBody,  
+    { new: true, runValidators: true }  
+  );
+
+  if (!updatedLocation) {
+    return res.status(404).json({ success: false, message: 'Location not found.' });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Location updated successfully.',
+    data: updatedLocation,
+  });
+});
 
 
 module.exports = {
-  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  getAllHotels, createHotel
+  getLocationByCoordinates, nearByLocations,  nearByHotels, getAllLocations, createLocation,  getAllHotels, createHotel,updateLocationById
 };
