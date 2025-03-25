@@ -7,7 +7,10 @@ const toggleFollow = catchAsync(async (req, res) => {
   const { followerId } = req.body;
   const { userId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(followerId)) {
+  if (
+    !mongoose.Types.ObjectId.isValid(userId) ||
+    !mongoose.Types.ObjectId.isValid(followerId)
+  ) {
     return res.status(400).json({
       success: false,
       message: "Invalid user ID(s).",
@@ -22,7 +25,9 @@ const toggleFollow = catchAsync(async (req, res) => {
   }
 
   let userFollowerDoc = await Follower.findOne({ userId });
-  let followerExists = userFollowerDoc?.followers.find((f) => f.user.equals(followerId));
+  let followerExists = userFollowerDoc?.followers.find((f) =>
+    f.user.equals(followerId)
+  );
 
   if (followerExists) {
     await Follower.updateOne(
@@ -37,23 +42,24 @@ const toggleFollow = catchAsync(async (req, res) => {
   } else {
     await Follower.findOneAndUpdate(
       { userId },
-      { $addToSet: { followers: { user: followerId, status: true } } }, 
+      { $addToSet: { followers: { user: followerId, status: true } } },
       { upsert: true, new: true }
     );
 
     await Follower.findOneAndUpdate(
       { userId: followerId },
-      { $addToSet: { following: { user: userId, status: true } } }, 
+      { $addToSet: { following: { user: userId, status: true } } },
       { upsert: true, new: true }
     );
   }
 
   return res.status(200).json({
     success: true,
-    message: followerExists ? "Follow status toggled successfully." : "User followed successfully.",
+    message: followerExists
+      ? "Follow status toggled successfully."
+      : "User followed successfully.",
   });
 });
-
 
 // const getFollowersOrFollowing = catchAsync(async (req, res) => {
 //   const { userId } = req.params;
@@ -88,7 +94,6 @@ const toggleFollow = catchAsync(async (req, res) => {
 //   });
 // });
 
-
 const getFollowersOrFollowing = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const { type, limit, offset } = req.query;
@@ -119,7 +124,7 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
   }
 
   // Filter only users where status = true
-  const filteredData = userData[type].filter(entry => entry.status === true);
+  const filteredData = userData[type].filter((entry) => entry.status === true);
   const total = filteredData.length;
 
   // Apply pagination
@@ -147,8 +152,4 @@ const getFollowersOrFollowing = catchAsync(async (req, res) => {
   });
 });
 
-
-
-
-
-module.exports = { toggleFollow , getFollowersOrFollowing};
+module.exports = { toggleFollow, getFollowersOrFollowing };

@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "_moduleAliases": {
+    "@controllers": "./src/controllers",
+    "@middlewares": "./src/middlewares",
+    "@validator": "./src/validator",
+    "@routes": "./src/routes",
+    "@models": "./src/models",
+    "@utils": "./src/helpers"
+  },
   "scripts": {
-    "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npm run dev\""
+    "dev": "nodemon -r module-alias/register src/app.js",
+    "start": "node -r module-alias/register src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +26,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongoose": "^8.10.0",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

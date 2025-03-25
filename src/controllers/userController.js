@@ -8,7 +8,7 @@ const { Location } = require("../models/locationdata");
 const getUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 1000;
 
     const skip = (page - 1) * limit;
 
@@ -46,9 +46,8 @@ const getUserById = async (req, res) => {
 // Create User
 const createUser = async (req, res) => {
   try {
-    const { fullName, username, email, password, dob, gender } =
-      req.body;
-    if (!fullName || !username || !email || !password || !gender ) {
+    const { fullName, username, email, password, dob, gender } = req.body;
+    if (!fullName || !username || !email || !password || !gender) {
       return res.status(400).json({ error: "All fields are required." });
     }
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -84,7 +83,6 @@ const createUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -169,7 +167,6 @@ const getFollowing = catchAsync(async (req, res) => {
 
 // Update User
 
-
 const cleanObject = (obj) => {
   Object.keys(obj).forEach((key) => {
     if (obj[key] === undefined || obj[key] === null) {
@@ -181,7 +178,7 @@ const cleanObject = (obj) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     let { dob } = req.body;
 
     // Format DOB if provided
@@ -190,7 +187,7 @@ const updateUser = async (req, res) => {
       dob = new Date(`${year}-${month}-${day}`);
     }
 
-    const data = cleanObject(req.body)
+    const data = cleanObject(req.body);
 
     // Update user in the database
     const updatedUser = await User.findByIdAndUpdate(
@@ -209,7 +206,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-
 module.exports = {
   userLogin,
   getUsers,
@@ -217,5 +213,5 @@ module.exports = {
   getFollowers,
   getFollowing,
   getUserById,
-  updateUser
+  updateUser,
 };
