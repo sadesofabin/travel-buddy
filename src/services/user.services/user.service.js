@@ -1,5 +1,10 @@
 const bcrypt = require("bcryptjs");
-const { addUser } = require("../../repository/user.repository/user.repository");
+const {
+  addUser,
+  getUserById,
+  getAllusers,
+  calculatePagination,
+} = require("../../repository/user.repository/user.repository");
 
 const addUserService = async (data) => {
   const salt = await bcrypt.genSalt(10);
@@ -12,9 +17,22 @@ const addUserService = async (data) => {
     data.dob = null;
   }
   await addUser(data);
-    return "sucess";
+  return "sucess";
+};
+
+const getUserByIdService = async (userId) => {
+  return await getUserById(userId);
+};
+
+const getAllUserService = async (page, limit) => {
+  const { totalUsers, totalPages, skip } =
+    await calculatePagination(page, limit);
+  const users = await getAllusers(skip, limit);
+  return { totalUsers, totalPages, users };
 };
 
 module.exports = {
   addUserService,
+  getUserByIdService,
+  getAllUserService,
 };

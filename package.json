@@ -12,19 +12,23 @@
     "@utils": "./src/helpers"
   },
   "scripts": {
-    "dev": "nodemon -r module-alias/register src/app.js",
-    "start": "node -r module-alias/register src/app.js"
+    "st:admin": "nodemon -r module-alias/register src/admin.js",
+    "st:server": "nodemon -r module-alias/register src/server.js",
+    "st:user": "nodemon -r module-alias/register src/user.js",
+    "st:location": "nodemon -r module-alias/register src/location.js",
+    "start": "concurrently \"npm run st:admin\" \"npm run st:server\" \"npm run st:user\" \"npm run st:location\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.9",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fast-gateway": "^4.0.1",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "mongoose": "^8.10.0",

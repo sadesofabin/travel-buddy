@@ -6,6 +6,7 @@ const LocationSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     state: { type: String, required: true },
     district: { type: String, required: true },
+    homeType: { type: Boolean, default: false },
     location: {
       type: { type: String, enum: ['Point'], required: true },
       coordinates: { type: [Number], required: true },

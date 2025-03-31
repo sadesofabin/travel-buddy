@@ -455,6 +455,7 @@ module.exports = {
   getLocationByCoordinates,
   nearByLocations,
   nearByHotels,
+
   getAllLocations,
   createLocation,
   getAllHotels,
