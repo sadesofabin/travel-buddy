@@ -6,7 +6,10 @@ const createContribution = catchAsync(async (req, res) => {
   const { latitude, longitude } = req.body;
 
   // Check if a contribution with the same latitude & longitude already exists
-  const existingContribution = await Contribution.findOne({ latitude, longitude });
+  const existingContribution = await Contribution.findOne({
+    latitude,
+    longitude,
+  });
 
   if (existingContribution) {
     return res.status(400).json({
@@ -26,34 +29,34 @@ const createContribution = catchAsync(async (req, res) => {
   });
 });
 
-
 // Get All Contributions
 const getContributions = catchAsync(async (req, res) => {
-  const limit = parseInt(req.query.limit, 10) || 10; 
-  const offset = parseInt(req.query.offset, 10) || 0; 
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const offset = parseInt(req.query.offset, 10) || 0;
   const status = req.query.status;
 
   const filter = {};
   if (status) {
-    const validStatuses = ['requested', 'approved', 'rejected'];
+    const validStatuses = ["requested", "approved", "rejected"];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: `Invalid status value. Allowed values are: ${validStatuses.join(', ')}.` });
+      return res.status(400).json({
+        error: `Invalid status value. Allowed values are: ${validStatuses.join(
+          ", "
+        )}.`,
+      });
     }
     filter.status = status;
   }
 
   const totalContributions = await Contribution.countDocuments(filter);
-  
+
   const totalPages = Math.ceil(totalContributions / limit);
   console.log(totalContributions);
-  
+
   const contributions = await Contribution.find(filter)
     .skip(offset)
     .limit(limit);
 
-    console.log(contributions);
-    
-    
   const currentPage = Math.floor(offset / limit) + 1;
 
   res.status(200).json({
@@ -63,10 +66,6 @@ const getContributions = catchAsync(async (req, res) => {
     totalContributions,
   });
 });
-
-
-
-
 
 // Get Contribution by ID
 const getContributionById = catchAsync(async (req, res) => {
@@ -102,7 +101,6 @@ const deleteContribution = catchAsync(async (req, res) => {
 
   res.status(200).json({ message: "Contribution soft deleted successfully" });
 });
-
 
 module.exports = {
   createContribution,

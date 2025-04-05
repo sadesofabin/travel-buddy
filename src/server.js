@@ -1,18 +1,30 @@
+require("dotenv").config();
 const gateway = require("fast-gateway");
+
+let admin = process.env.ADMIN_SERVICE;
+let users = process.env.USERS_SERVICE;
+let locations = process.env.LOCATIONS_SERVICE;
+
+// Use production URLs if env is PROD
+if (process.env.URL === "PROD") {
+  admin = process.env.ADMIN_SERVICE_PROD;
+  users = process.env.USERS_SERVICE_PROD;
+  locations = process.env.LOCATIONS_SERVICE_PROD;
+}
 
 const server = gateway({
   routes: [
     {
       prefix: "/admin",
-      target: "http://localhost:5001",
+      target: admin,
     },
     {
       prefix: "/users",
-      target: "http://localhost:5002",
+      target: users,
     },
     {
       prefix: "/locations",
-      target: "http://localhost:5003",
+      target: locations,
     },
   ],
 });
