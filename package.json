@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "_moduleAliases": {
-    "@controllers": "./src/controllers",
-    "@middlewares": "./src/middlewares",
-    "@validator": "./src/validator",
-    "@routes": "./src/routes",
-    "@models": "./src/models",
-    "@utils": "./src/helpers"
+    "@controllers": "src/controllers",
+    "@middlewares": "src/middlewares",
+    "@validator": "src/validator",
+    "@routes": "src/routes",
+    "@models": "src/models",
+    "@utils": "src/helpers",
+    "@repository": "src/repository",
+    "@services": "src/services"   
   },
   "scripts": {
     "st:admin": "nodemon -r module-alias/register src/admin.js",

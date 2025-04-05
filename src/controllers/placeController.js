@@ -1,4 +1,4 @@
-const Contribution = require("../models/place");
+const Contribution = require("../models/contribution");
 const catchAsync = require("../helpers/catchAsync");
 
 // Create Contribution
@@ -63,6 +63,7 @@ const getContributions = catchAsync(async (req, res) => {
     totalContributions,
   });
 });
+
 
 
 

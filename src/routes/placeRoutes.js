@@ -10,6 +10,7 @@ const {
 } = require("../controllers/placeController");
 
 router.post("/createContribution", createContribution);
+
 router.get("/getContributions", getContributions);
 router.get("/getContributionById/:id", getContributionById);
 router.put("/updateContribution/:id", updateContribution);
