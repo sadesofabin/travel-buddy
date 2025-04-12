@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db-connect");
 const routes = require("./routes/user.route/index");
+const authRoth = require("./routes/auth.route/index");
+
 const {
   errorHandler,
   badRequestHandler,
@@ -40,6 +42,8 @@ connectDB();
 initServer();
 
 app.use("/api", routes);
+app.use("/api/auth", authRoth);
+
 
 // Health Check Route
 app.get("/health", (req, res) => {
