@@ -10,6 +10,7 @@ const {
   saveRouteToDB,
   nearByHotels,
   nearByHotelsPagination,
+  getAllLocationsBySlug
 } = require("../../repository/location.repository/location.repository");
 
 const getAllLocationService = async (data) => {
@@ -191,9 +192,14 @@ const nearByHotelsService = async (data) => {
   return { totalLocations, totalPages, locations: enrichedLocations };
 };
 
+const getLocationByslugService = async (slug) => {
+  return await getAllLocationsBySlug(slug);
+};
+
 module.exports = {
   getAllLocationService,
   getLocationService,
   nearByLocationsService,
   nearByHotelsService,
+  getLocationByslugService,
 };

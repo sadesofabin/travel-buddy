@@ -79,11 +79,38 @@ const locationRepository = {
   },
 
   async getLocations(skip, limit, query) {
-    const response = await Location.find(query).skip(skip).limit(limit);
+    const locations = await Location.find(query).skip(skip).limit(limit);
+
+    const districts = [...new Set(locations.map((loc) => loc.district))];
+
+    const touristCounts = await Location.aggregate([
+      { $match: { district: { $in: districts } } },
+      { $group: { _id: "$district", count: { $sum: 1 } } },
+    ]);
+
+    const hotelCounts = await Hotel.aggregate([
+      { $match: { district: { $in: districts } } },
+      { $group: { _id: "$district", count: { $sum: 1 } } },
+    ]);
+
+    const toMap = (arr) => {
+      return arr.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {});
+    };
+
+    const touristMap = toMap(touristCounts);
+    const hotelMap = toMap(hotelCounts);
+
+    const response = locations.map((loc) => ({
+      ...loc.toObject(),
+      touristPlaceCount: touristMap[loc.district] || 0,
+      hotelCount: hotelMap[loc.district] || 0,
+    }));
 
     return response;
   },
-
   async locationPagination(page, limit, query) {
     const totalLocations = await Location.countDocuments(query);
     const totalPages = Math.ceil(totalLocations / limit);
@@ -181,6 +208,9 @@ const locationRepository = {
     const skip = (page - 1) * limit;
 
     return { totalHotels, totalPages, skip };
+  },
+  async getAllLocationsBySlug(slug) {
+    return await Location.find({ slug });
   },
 };
 

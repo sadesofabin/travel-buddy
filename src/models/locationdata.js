@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const LocationSchema = new mongoose.Schema(
   {
     slug: { type: String, required: true, unique: true },
@@ -8,46 +7,50 @@ const LocationSchema = new mongoose.Schema(
     district: { type: String, required: true },
     homeType: { type: Boolean, default: false },
     location: {
-      type: { type: String, enum: ['Point'], required: true },
+      type: { type: String, enum: ["Point"], required: true },
       coordinates: { type: [Number], required: true },
     },
     terrain: {
       type: String,
-      enum: ['mountain', 'forest', 'desert', 'coastal', 'plain'],
+      enum: ["mountain", "forest", "desert", "coastal", "plain"],
       required: true,
     },
     title: { type: String, required: true },
     placeName: { type: String, required: true },
     description: { type: String, required: true },
     rating: { type: Number, min: 0, max: 5, default: 0 },
-    photos: [{ type: String }],
+    photos: [
+      {
+        url: { type: String },
+        altText: { type: String },
+      },
+    ],
     resource: {
       type: String,
-      enum: ['public', 'individual'],
+      enum: ["public", "individual"],
       required: true,
     },
     metaTitle: { type: String },
     metaDescription: { type: String },
     isDeleted: { type: Boolean, default: false },
-    commentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    commentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,
   }
 );
 
-LocationSchema.index({ location: "2dsphere" }); 
+LocationSchema.index({ location: "2dsphere" });
 LocationSchema.index({ state: 1, district: 1, terrain: 1, isDeleted: 1 });
-
 
 const HotelSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    type: { 
-      type: String, 
-      enum: ["hotel", "resort"], 
-      required: true 
+    type: {
+      type: String,
+      enum: ["hotel", "resort"],
+      required: true,
     },
     location: {
       type: { type: String, enum: ["Point"], required: true },
@@ -59,8 +62,12 @@ const HotelSchema = new mongoose.Schema(
     description: { type: String, required: true },
     rating: { type: Number, min: 0, max: 5, default: 0 },
 
-    photos: [{ type: String }],
-
+    photos: [
+      {
+        url: { type: String },
+        altText: { type: String },
+      },
+    ],
     rooms: [
       {
         roomType: { type: String, required: true },

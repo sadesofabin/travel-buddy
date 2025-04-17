@@ -4,6 +4,7 @@ const {
   getLocationService,
   nearByLocationsService,
   nearByHotelsService,
+  getLocationByslugService
 } = require("../../services/location.services/location.services");
 
 const getAllLocations = catchAsync(async (req, res) => {
@@ -34,9 +35,17 @@ const nearByHotels = catchAsync(async (req, res) => {
   res.status(200).json({ sucess: true, status: 200, hotels });
 });
 
+const getLocationsBySlug = catchAsync(async (req, res) => {  
+  const { slug } = req.params;
+  const location = await getLocationByslugService(slug);
+  res.status(200).json({ sucess: true, status: 200, location });
+});
+
+
 module.exports = {
   getAllLocations,
   getLocations,
   nearByLocations,
   nearByHotels,
+  getLocationsBySlug
 };
