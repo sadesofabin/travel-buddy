@@ -18,6 +18,8 @@ const LocationSchema = new mongoose.Schema(
     title: { type: String, required: true },
     placeName: { type: String, required: true },
     description: { type: String, required: true },
+    longDescription: {type: String, required: true },
+    thingsTodo:  {type: [String], required: true },
     rating: { type: Number, min: 0, max: 5, default: 0 },
     photos: [
       {

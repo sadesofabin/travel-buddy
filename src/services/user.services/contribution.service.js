@@ -6,7 +6,7 @@ const {
 } = require("@repository/user.repository/contribution.repository");
 
 const addContributionService = async (data) => {
-  const { latitude, longitude } = data;
+  const { latitude, longitude, photos } = data;
 
   const nominatimURL = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
   const geoRes = await axios.get(nominatimURL, {
@@ -34,8 +34,14 @@ const addContributionService = async (data) => {
   data.state = state;
   data.district = district;
   data.type = terrainType;
-  delete terrainKeywords;
 
+  if (Array.isArray(photos)) {
+    data.photos = photos.map((url) => ({
+      url: url,
+      altText: data.name || "photo",
+    }));
+  }
+  delete terrainKeywords;
   const response = await addContribution(data);
 
   if (response === "NOTFOUND") {
