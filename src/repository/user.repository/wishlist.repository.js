@@ -35,6 +35,18 @@ const wishListRepository = {
 
     return { message: currentStatus };
   },
+  async wishlisted(userId, locationId) {
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
+      return "USERNOTFOUND";
+    }
+    const locationExists = await Location.exists({ _id: locationId });
+    if (!locationExists) {
+      return "LOCATIONNOTFOUND";
+    }
+    const wishlistEntry = await Wishlist.findOne({ userId, locationId });
+    return !!wishlistEntry;
+  },
 };
 
 module.exports = wishListRepository;
