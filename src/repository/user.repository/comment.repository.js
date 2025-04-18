@@ -74,15 +74,15 @@ const commentRepository = {
       return "NOTFOUND";
     }
     const response = await Comment.find({ locationId: locationId })
-      .populate("userId", "name profilePicture")
-      .populate("likes", "name profilePicture")
+      .populate("userId", "fullName profilePic")
+      .populate("likes", "fullName profilePic")
       .populate({
         path: "replies.userId",
-        select: "name profilePicture",
+        select: "fullName profilePic",
       })
       .populate({
         path: "replies.likes",
-        select: "name profilePicture",
+        select: "fullName profilePic",
       });
 
     return response;
