@@ -1,4 +1,6 @@
 const express = require("express");
+const upload = require("../../middlewares/upload.middlewares");
+
 const {
   addContribution,
   getContribution
@@ -6,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.post("/add", addContribution);
+router.post("/add", upload.array("photos", 3),addContribution);
 router.get("/get/:userId", getContribution);
 
 

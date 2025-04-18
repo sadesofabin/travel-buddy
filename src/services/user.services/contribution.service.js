@@ -5,9 +5,12 @@ const {
   calculatePagination,
 } = require("@repository/user.repository/contribution.repository");
 
-const addContributionService = async (data) => {
-  const { latitude, longitude, photos } = data;
-
+const addContributionService = async (data, images) => {
+  const { latitude, longitude } = data;
+  const baseUrl = process.env.MAIN_SERVICE;
+  const photos = images.map(file =>
+    `${baseUrl}/uploads/${file.filename}`
+  );
   const nominatimURL = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
   const geoRes = await axios.get(nominatimURL, {
     headers: {
@@ -30,6 +33,12 @@ const addContributionService = async (data) => {
 
   const elevation = terrainRes.data.elevation || null;
   const terrainType = getTerrainType(elevation, data.terrainKeywords);
+  
+  if (terrainType === "unknown") {
+    const error = new Error("Please Select Type Appropiate To Elevation");
+    error.statusCode = 400;
+    throw error;
+  }
   data.country = country;
   data.state = state;
   data.district = district;
@@ -56,7 +65,7 @@ const addContributionService = async (data) => {
 const getTerrainType = (elevation, terrainKeywords) => {
   const elevationNum = parseFloat(elevation);
   const lowerLocation = JSON.stringify(terrainKeywords).toLowerCase();
-
+  
   if (elevationNum >= 2500) return "mountain";
   if (
     elevationNum <= 50 &&

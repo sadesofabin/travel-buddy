@@ -5,7 +5,8 @@ const {
 } = require("../../services/user.services/contribution.service");
 
 const addContribution = catchAsync(async (req, res) => {
-  await addContributionService(req.body);
+  const photos = req.files;  
+  await addContributionService(req.body, photos);
   res.status(201).json({
     sucess: true,
     status: 201,
@@ -15,8 +16,8 @@ const addContribution = catchAsync(async (req, res) => {
 
 const getContribution = catchAsync(async (req, res) => {
   const { userId } = req.params;
-  const limit = parseInt(req.query.limit, 10) || 10; 
-  const page = parseInt(req.query.page, 10) || 1; 
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const page = parseInt(req.query.page, 10) || 1;
   const contribution = await getContributionService(page, limit, userId);
   res.status(200).json({
     sucess: true,

@@ -40,7 +40,7 @@ const initServer = async () => {
 // Connect to DB and start the server
 connectDB();
 initServer();
-
+app.use('/uploads', express.static('uploads'));
 app.use("/api", routes);
 app.use("/api/auth", authRoth);
 

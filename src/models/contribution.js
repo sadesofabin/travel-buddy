@@ -32,7 +32,9 @@ const ContributionSchema = new mongoose.Schema(
     safety: { type: String },
     guides: { type: Boolean, default: false },
     rating: { type: Number, min: 0, max: 5 },
-    tips: { type: [String] ,  required: true},
+    tips: { type: [String], required: true },
+    longDescription: { type: String },
+    thingsTodo: { type: [String] },
     status: {
       type: String,
       enum: ["requested", "approved", "rejected"],
