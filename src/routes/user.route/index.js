@@ -5,6 +5,8 @@ const commentRoutes = require("./commentRoute");
 const followerRoute = require("./followerRoute");
 const wishlistRoute = require("./wishlistRoute");
 const contributionRoute = require("./contributionRoute");
+const newsandeventsroute = require("./newsandeventsroute");
+
 
 
 
@@ -15,6 +17,8 @@ router.use("/comment", commentRoutes);
 router.use("/follower", followerRoute);
 router.use("/wishlist", wishlistRoute);
 router.use("/contribution", contributionRoute);
+router.use("/newandevents", newsandeventsroute);
+
 
 
 
