@@ -44,7 +44,7 @@ const wishListRepository = {
     if (!locationExists) {
       return "LOCATIONNOTFOUND";
     }
-    const wishlistEntry = await Wishlist.findOne({ userId, locationId });
+    const wishlistEntry = await Wishlist.findOne({ userId, locationId, wishList: true });
     return !!wishlistEntry;
   },
 
