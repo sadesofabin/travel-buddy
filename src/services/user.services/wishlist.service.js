@@ -68,8 +68,6 @@ const getWishilistByIdService = async (page, limit, userId, lat, long) => {
     error.statusCode = 404;
     throw error;
   }
-  console.log(responce, "111111111111111111111111111111");
-
   const enrichedLocations = await Promise.all(
     responce.map(async (loc) => {
       const currentLocation = [long, lat];
