@@ -47,6 +47,31 @@ const wishListRepository = {
     const wishlistEntry = await Wishlist.findOne({ userId, locationId });
     return !!wishlistEntry;
   },
+
+  async getWishilistById(skip, limit, userId) {
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
+      return "USERNOTFOUND";
+    }
+
+    const wishlistEntry = await Wishlist.find({ userId })
+      .skip(skip)
+      .limit(limit)
+      .populate("locationId");
+
+    if (!wishlistEntry) {
+      return "NOTFOUND";
+    }
+
+    return wishlistEntry;
+  },
+  async calculatePagination(page, limit, userId) {
+    const totalLocations = await Wishlist.countDocuments({ userId });
+    const totalPages = Math.ceil(totalLocations / limit);
+    const skip = (page - 1) * limit;
+
+    return { totalLocations, totalPages, skip };
+  },
 };
 
 module.exports = wishListRepository;
