@@ -3,24 +3,39 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "_moduleAliases": {
+    "@controllers": "src/controllers",
+    "@middlewares": "src/middlewares",
+    "@validator": "src/validator",
+    "@routes": "src/routes",
+    "@models": "src/models",
+    "@utils": "src/helpers",
+    "@repository": "src/repository",
+    "@services": "src/services"   
+  },
   "scripts": {
-    "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npm run dev\""
+    "st:admin": "nodemon -r module-alias/register src/admin.js",
+    "st:server": "nodemon -r module-alias/register src/server.js",
+    "st:user": "nodemon -r module-alias/register src/user.js",
+    "st:location": "nodemon -r module-alias/register src/location.js",
+    "start": "concurrently \"npm run st:admin\" \"npm run st:server\" \"npm run st:user\" \"npm run st:location\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.9",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fast-gateway": "^4.0.1",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongoose": "^8.10.0",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
