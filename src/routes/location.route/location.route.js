@@ -12,6 +12,6 @@ router.get("/getAll", getAllLocations);
 router.get("/get", getLocations);
 router.get("/getNearBy", nearByLocations);
 router.get("/getHotels", nearByHotels);
-router.post("/getLoc/:slug", getLocationsBySlug);
+router.get("/getLoc/:slug", getLocationsBySlug);
 
 module.exports = router;

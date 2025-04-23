@@ -192,33 +192,9 @@ const nearByHotelsService = async (data) => {
   return { totalLocations, totalPages, locations: enrichedLocations };
 };
 
-const getLocationByslugService = async (slug, lat, long) => {
-  const orsApiKey = process.env.NEXT_PUBLIC_OPENROUTESERVICE_API_KEY;
+const getLocationByslugService = async (slug) => {
   const response = await getAllLocationsBySlug(slug);
-  const locationDoc  = response[0];
-  const location = locationDoc.toObject();
-  const currentLocation = [long, lat];
-  const destination = [
-    location.location.coordinates[0],
-    location.location.coordinates[1],
-  ];
-
-
-  let routeData = await getRouteFromDB(currentLocation, destination);
-  if (!routeData) {
-    routeData = await fetchRouteFromAPI(
-      currentLocation,
-      destination,
-      orsApiKey
-    );
-    if (!routeData.error) {
-      await saveRouteToDB(currentLocation, destination, routeData);
-    }
-  }
-  location.distance = routeData?.distance || null;
-  location.duration = routeData?.duration || null;
-  location.expectedArrivalTime = routeData?.expectedArrivalTime || null; 
-  return location;
+  return response;
 };
 
 module.exports = {
