@@ -3,11 +3,13 @@ const locationroute = require("../../models/locationroute");
 const axios = require("axios");
 
 const locationRepository = {
-  async getAllLocations(skip, limit, query) {
+  async getAllLocations(skip, limit, query) {    
     return await Location.find(query).skip(skip).limit(limit);
   },
 
   async getRouteFromDB(currentLocation, destination) {
+    console.log(currentLocation, destination );
+    
     return await locationroute.findOne({
       currentlat: currentLocation[1],
       currentlng: currentLocation[0],
@@ -29,6 +31,7 @@ const locationRepository = {
 
     await newRoute.save();
   },
+
   async fetchRouteFromAPI(currentLocation, destination, orsApiKey) {
     const url = "https://api.openrouteservice.org/v2/directions/driving-car";
     const requestData = {
@@ -36,13 +39,14 @@ const locationRepository = {
       format: "json",
     };
 
+
     try {
       const { data } = await axios.post(url, requestData, {
         headers: {
           Authorization: orsApiKey,
           "Content-Type": "application/json",
         },
-      });
+      });      
 
       if (data.routes.length > 0) {
         const route = data.routes[0].segments[0];
@@ -54,8 +58,8 @@ const locationRepository = {
         const arrivalTime = new Date(
           Date.now() + durationInSeconds * 1000
         ).toISOString();
-
         return {
+          statusCode: 200,
           distance: distanceText,
           duration: durationText,
           expectedArrivalTime: arrivalTime,
@@ -63,11 +67,24 @@ const locationRepository = {
       }
       return { error: "No route found" };
     } catch (error) {
-      console.error(
-        "Error fetching route data:",
-        error.response?.data || error.message
-      );
-      return { error: "Route data unavailable" };
+      // Extract detailed ORS message if available
+      const orsErrorMessage = error?.response?.data?.error?.message;
+      const orsErrorCode = error?.response?.data?.error?.code;
+  
+      if (orsErrorCode === 2010) {
+        return {
+          statusCode:2010,
+          distance: 0,
+          duration: 0,
+          expectedArrivalTime: 0,
+        };
+      }
+  
+      // Generic fallback error
+      console.error("Error fetching route data:", error?.response?.data || error.message);
+      return {
+        error: orsErrorMessage || "Route data unavailable",
+      };
     }
   },
   async calculatePagination(page, limit, query) {

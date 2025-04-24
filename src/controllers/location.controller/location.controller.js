@@ -8,7 +8,9 @@ const {
 } = require("../../services/location.services/location.services");
 
 const getAllLocations = catchAsync(async (req, res) => {
-  const { limit, page, state, district, terrain, lat, long } = req.query;
+  const { limit, page, state, district, terrain, lat, long } = req.query;  
+  console.log(limit, page, state, district, terrain, lat, long, "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+  
   const data = { limit, page, state, district, terrain, lat, long };
   const locations = await getAllLocationService(data);
   res.status(200).json({ sucess: true, status: 200, locations });

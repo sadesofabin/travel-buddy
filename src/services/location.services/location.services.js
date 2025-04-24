@@ -1,3 +1,4 @@
+const { late } = require("zod");
 const {
   getAllLocations,
   getLocations,
@@ -41,14 +42,15 @@ const getAllLocationService = async (data) => {
         loc.location.coordinates[1],
       ];
 
-      let routeData = await getRouteFromDB(currentLocation, destination);
+      let routeData = await getRouteFromDB(currentLocation, destination);      
       if (!routeData) {
         routeData = await fetchRouteFromAPI(
           currentLocation,
           destination,
           orsApiKey
-        );
-        if (!routeData.error) {
+        );        
+        if (routeData.statusCode === 200) {          
+          delete routeData.statusCode
           await saveRouteToDB(currentLocation, destination, routeData);
         }
       }
